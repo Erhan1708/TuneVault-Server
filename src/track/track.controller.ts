@@ -1,15 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { TrackService } from "./track.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
-import { FileService, FileType } from "src/file/file.service";
+import { CategoryType, FileService, FileType } from "src/file/file.service";
 import { UpdateTrackDto } from "./dto/update-track.dto";
 
 @ApiTags('Tracks')
 @Controller('api/tracks')
 export class TrackController {
-
     constructor(
         private trackService: TrackService,
         private fileService: FileService,
@@ -24,12 +23,12 @@ export class TrackController {
         description: 'Данные для создания трека',
         schema: {
             type: 'object',
-            required: ['trackName', 'artist', 'imgPath', 'audio'],
+            required: ['trackName', 'artist', 'trackText', 'albumId', 'imgPath', 'audio'],
             properties: {
                 trackName: { type: 'string', example: 'Imagine' },
                 artist: { type: 'string', example: 'John Lennon' },
                 trackText: { type: 'string', example: 'Imagine all the people...' },
-                albumName: { type: 'string', example: 'Imagine' },
+                albumId: { type: 'string', example: '' },
                 imgPath: { type: 'string', format: 'binary' },
                 audio: { type: 'string', format: 'binary' },
             },
@@ -72,7 +71,7 @@ export class TrackController {
                 trackName: { type: 'string', example: '' },
                 artist: { type: 'string', example: '' },
                 trackText: { type: 'string', example: '' },
-                albumName: { type: 'string', example: '' },
+                albumId: { type: 'string', example: '' },
                 imgPath: { type: 'string', format: 'binary' },
                 audio: { type: 'string', format: 'binary' },
             },
@@ -94,20 +93,20 @@ export class TrackController {
         if (dto.trackName) updateData.trackName = dto.trackName;
         if (dto.artist) updateData.artist = dto.artist;
         if (dto.trackText) updateData.trackText = dto.trackText;
-        if (dto.albumName) updateData.albumName = dto.albumName;
+        if (dto.albumId) updateData.albumId = dto.albumId;
 
         if (files?.imgPath?.[0]) {
             if (track.imgPath) {
                 this.fileService.removeDirectoryFile(track.imgPath);
             }
-            updateData.imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, files.imgPath[0]);
+            updateData.imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, files.imgPath[0], CategoryType.TRACK);
         }
 
         if (files?.audio?.[0]) {
             if (track.audio) {
                 this.fileService.removeDirectoryFile(track.audio);
             }
-            updateData.audio = this.fileService.createDirectoryFile(FileType.AUDIO, files.audio[0]);
+            updateData.audio = this.fileService.createDirectoryFile(FileType.AUDIO, files.audio[0], CategoryType.TRACK);
         }
 
         return this.trackService.updateTrack(id, updateData);

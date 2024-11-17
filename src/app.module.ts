@@ -8,8 +8,8 @@ import * as path from 'path';
 
 @Module({
   imports: [
-    TrackModule,
     AlbumModule,
+    TrackModule,
     FileModule,
     ServeStaticModule.forRoot({rootPath: path.resolve(__dirname, 'static')}),
     MongooseModule.forRoot('mongodb+srv://erhan:gtx1708erhan@clustertunevaultserver.aweti.mongodb.net/?retryWrites=true&w=majority&appName=ClusterTuneVaultServer')

@@ -11,5 +11,5 @@ export class UpdateTrackDto {
   trackText?: string;
 
   @ApiProperty({ example: 'Imagine', description: 'Название альбома', required: false })
-  albumName?: string;
+  albumId?: string;
 }

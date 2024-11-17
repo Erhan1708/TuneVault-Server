@@ -17,7 +17,7 @@ export class Track {
   @Prop()
   trackText: string;
 
-  @Prop()
+  @Prop({ default: 0 })
   listens: number;
 
   @Prop()
@@ -28,6 +28,9 @@ export class Track {
   
   @Prop()
   albumName: string;
+  
+  @Prop()
+  albumId: string;
 }
 
 export const TrackSchema = SchemaFactory.createForClass(Track)

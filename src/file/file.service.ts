@@ -9,19 +9,33 @@ export enum FileType {
     VIDEO = 'video'
 }
 
+export enum CategoryType {
+    ALBUM = 'album',
+    TRACK = 'track'
+}
+
 @Injectable()
 export class FileService {
-    createDirectoryFile(type: FileType, file): string {
+    createDirectoryFile(type: FileType, file, category: CategoryType): string {
         try {
             const fileException = file.originalname.split('.').pop();
             const fileName = uuidv4() + '.' + fileException
-            const filePath = path.resolve(__dirname, '..', 'static',  type)
+
+            const filePath = path.resolve(
+                __dirname,
+                '..',
+                'static',
+                category,
+                type === FileType.IMAGE ? 'images' : 'audios'
+            )
             
             if (!fs.existsSync(filePath)) {
                 fs.mkdirSync(filePath, { recursive: true })
             }
+
             fs.writeFileSync(path.resolve(filePath, fileName), file.buffer)
-            return type + '/' + fileName
+
+            return `${category}/${type === FileType.IMAGE ? 'images' : 'audios'}/${fileName}`;
         } catch (e) {
             throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }

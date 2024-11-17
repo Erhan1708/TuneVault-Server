@@ -11,5 +11,5 @@ export class CreateTrackDto {
   readonly trackText: string;
 
   @ApiProperty({ example: 'Imagine', description: 'Название альбома' })
-  readonly albumName: string;
+  readonly albumId: string;
 }
