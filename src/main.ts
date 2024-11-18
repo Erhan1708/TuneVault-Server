@@ -18,7 +18,7 @@ const server = async () => {
     SwaggerModule.setup('api', app, document)
 
     await app.listen(PORT, () => {
-      console.log(`server listening on port http://localhost:${PORT}/api`)
+      console.log(`server listening on port http://localhost:${PORT}`)
     })
   } catch (e) {
     console.log(e)
