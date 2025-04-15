@@ -16,26 +16,21 @@ export enum CategoryType {
 
 @Injectable()
 export class FileService {
-    createDirectoryFile(type: FileType, file, category: CategoryType): string {
+    createDirectoryFile(type: FileType, file, category: CategoryType, host: string): string {
         try {
             const fileException = file.originalname.split('.').pop();
-            const fileName = uuidv4() + '.' + fileException
+            const fileName = uuidv4() + '.' + fileException;
 
-            const filePath = path.resolve(
-                __dirname,
-                '..',
-                'static',
-                category,
-                type === FileType.IMAGE ? 'images' : 'audios'
-            )
-            
+            const relativePath = `${category}/${type === FileType.IMAGE ? 'images' : 'audios'}`;
+            const filePath = path.resolve(__dirname, '..', 'static', relativePath);
+
             if (!fs.existsSync(filePath)) {
-                fs.mkdirSync(filePath, { recursive: true })
+                fs.mkdirSync(filePath, { recursive: true });
             }
 
-            fs.writeFileSync(path.resolve(filePath, fileName), file.buffer)
+            fs.writeFileSync(path.resolve(filePath, fileName), file.buffer);
 
-            return `${category}/${type === FileType.IMAGE ? 'images' : 'audios'}/${fileName}`;
+            return `${host}/static/${relativePath}/${fileName}`;
         } catch (e) {
             throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }

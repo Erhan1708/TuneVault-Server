@@ -6,6 +6,7 @@ import { CreateTrackDto } from "./dto/create-track.dto";
 import { v4 as uuidv4 } from 'uuid';
 import { CategoryType, FileService, FileType } from "src/file/file.service";
 import { Album, AlbumDocument } from "src/album/schemas/album.schema";
+import { Request } from "express";
 
 @Injectable()
 export class TrackService {
@@ -15,9 +16,10 @@ export class TrackService {
         private fileService: FileService,
     ) {}
 
-    async createTrack(dto: CreateTrackDto, img, audio): Promise<Track> {
-        const audioPath = this.fileService.createDirectoryFile(FileType.AUDIO, audio, CategoryType.TRACK)
-        const imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, img, CategoryType.TRACK)
+    async createTrack(dto: CreateTrackDto, img, audio, req: Request): Promise<Track> {
+        const host = req.protocol + '://' + req.get('host');
+        const audioPath = this.fileService.createDirectoryFile(FileType.AUDIO, audio, CategoryType.TRACK, host);
+        const imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, img, CategoryType.TRACK, host);
 
         const album = await this.albumModel.findOne({ id: dto.albumId });
 

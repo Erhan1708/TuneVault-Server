@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { TrackService } from "./track.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { CategoryType, FileService, FileType } from "src/file/file.service";
 import { UpdateTrackDto } from "./dto/update-track.dto";
+import { Request } from "express";
 
 @ApiTags('Tracks')
 @Controller('api/tracks')
@@ -41,9 +42,10 @@ export class TrackController {
     createTrack(
         @UploadedFiles() files,
         @Body() dto: CreateTrackDto,
+        @Req() req: Request,
     ) {
         const { imgPath, audio } = files;
-        return this.trackService.createTrack(dto, imgPath[0], audio[0]);
+        return this.trackService.createTrack(dto, imgPath[0], audio[0], req);
     }
 
     @Get()
@@ -85,7 +87,9 @@ export class TrackController {
         @Param('id') id: string,
         @UploadedFiles() files,
         @Body() dto: UpdateTrackDto,
+        @Req() req: Request,
     ) {
+        const host = req.protocol + '://' + req.get('host');
         const track = await this.trackService.getTrackOne(id);
 
         const updateData: Partial<UpdateTrackDto & { imgPath?: string; audio?: string }> = {};
@@ -99,14 +103,14 @@ export class TrackController {
             if (track.imgPath) {
                 this.fileService.removeDirectoryFile(track.imgPath);
             }
-            updateData.imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, files.imgPath[0], CategoryType.TRACK);
+            updateData.imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, files.imgPath[0], CategoryType.TRACK, host);
         }
 
         if (files?.audio?.[0]) {
             if (track.audio) {
                 this.fileService.removeDirectoryFile(track.audio);
             }
-            updateData.audio = this.fileService.createDirectoryFile(FileType.AUDIO, files.audio[0], CategoryType.TRACK);
+            updateData.audio = this.fileService.createDirectoryFile(FileType.AUDIO, files.audio[0], CategoryType.TRACK, host);
         }
 
         return this.trackService.updateTrack(id, updateData);

@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { AlbumService } from "./album.service";
 import { FileService } from "src/file/file.service";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { CreateAlbumDto } from "./dto/create-album.dto";
+import { Request } from "express";
 
 @ApiTags('Albums')
 @Controller('api/albums')
@@ -34,9 +35,10 @@ export class AlbumController {
     createAlbum(
         @UploadedFiles() files,
         @Body() dto: CreateAlbumDto,
+        @Req() req: Request,
     ) {
         const { imgPath } = files
-        return this.albumService.createAlbum(dto, imgPath[0])
+        return this.albumService.createAlbum(dto, imgPath[0], req)
     }
 
     @Get()

@@ -5,6 +5,7 @@ import { Model } from "mongoose";
 import { CreateAlbumDto } from "./dto/create-album.dto";
 import { v4 as uuidv4 } from "uuid";
 import { CategoryType, FileService, FileType } from "src/file/file.service";
+import { Request } from "express";
 
 @Injectable()
 export class AlbumService {
@@ -14,8 +15,9 @@ export class AlbumService {
         private fileService: FileService,
     ) {}
 
-    async createAlbum(dto: CreateAlbumDto, img): Promise<Album> {
-        const imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, img, CategoryType.ALBUM)
+    async createAlbum(dto: CreateAlbumDto, img, req: Request): Promise<Album> {
+        const host = req.protocol + '://' + req.get('host')
+        const imgPath = this.fileService.createDirectoryFile(FileType.IMAGE, img, CategoryType.ALBUM, host)
         const album = await this.albumModel.create({
             ...dto,
             id: uuidv4(),
