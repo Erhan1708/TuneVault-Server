@@ -21,8 +21,13 @@ export class FileService {
             const fileException = file.originalname.split('.').pop();
             const fileName = uuidv4() + '.' + fileException;
 
-            const relativePath = `${category}/${type === FileType.IMAGE ? 'images' : 'audios'}`;
-            const filePath = path.resolve(__dirname, '..', 'static', relativePath);
+            const filePath = path.resolve(
+                __dirname,
+                '..',
+                'static',
+                category,
+                type === FileType.IMAGE ? 'images' : 'audios'
+            );
 
             if (!fs.existsSync(filePath)) {
                 fs.mkdirSync(filePath, { recursive: true });
@@ -30,7 +35,7 @@ export class FileService {
 
             fs.writeFileSync(path.resolve(filePath, fileName), file.buffer);
 
-            return `${host}/static/${relativePath}/${fileName}`;
+            return `${host}/${category}/${type === FileType.IMAGE ? 'images' : 'audios'}/${fileName}`;
         } catch (e) {
             throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
